@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>GAE DB Manager</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<style type="text/css">
+body {
+	padding: 5px;
+	font-size: large;
+}
+* {
+	font-family: monospace;
+	font-size: 13px;
+}
+input {
+	border: none;
+}
+#table {
+	clear: both;
+	border-spacing: 0;
+}
+#table tr:hover {
+	background-color: #EEF;
+}
+#table th {
+	text-align: left;
+	border-bottom: 2px solid #6e7376;
+	padding: 0.1em 1em;
+	color: #4a4a4a;
+	overflow: hidden;
+}
+#table td {
+	text-align: left;
+	padding: 0.1em 1em;
+	overflow: hidden;
+	border-left: 1px gray solid;
+}
+#table td:first-child {
+	border-left-width: 0;
+}
+#query {
+	font-size: 1.5em;
+	max-width: 30em;
+	display: table;
+}
+#query > div {
+	display: table-row;
+}
+#query > div > div {
+	display: table-cell;
+}
+#query .filters {
+	display: table;
+}
+#query .filters > div {
+	display: table-row;
+}
+#query .filters > div > div{
+	display: table-cell;
+}
+#query > div > div:first-child {
+	text-align: right;
+	padding-right: 1em;
+}
+#query > div > div:last-child {
+	width: 100%;
+}
+#query .filter input[type="text"] {
+	max-width: 10em;
+}
+</style>
+<script type="application/javascript" src="js/lib/jquery-2.1.1.js"></script>
+<script type="application/javascript" src="js/db.js"></script>
+</head>
+<body>
+	<div id="query" onkeyup="if (event.keyCode == 13) refresh()">
+		<div>
+		  <div>SELECT</div>
+		  <div>*</div>
+		</div>
+		<div>
+			<div>FROM</div>
+			<div>
+				<input type="text" id="kind" list="kinds" placeholder="Kind"/>
+				<datalist id="kinds"></datalist>
+				<input type="text" id="ancestor" placeholder="Ancestor key"/>
+			</div>
+		</div>
+		<div>
+			<div><a href="javascript:addFilterInput()">WHERE</a></div>
+			<div class="filters">
+				<div class="filter">
+					<input type="text" class="name" placeholder="Name or __key__"/>
+				    <select class="operator">
+				    	<option value="EQUAL">=</option>
+				    	<option value="NOT_EQUAL">!=</option>
+				    	<option value="LESS_THAN">&lt;</option>
+				    	<option value="LESS_THAN_OR_EQUAL">&lt;=</option>
+				    	<option value="GREATER_THAN_OR_EQUAL">&gt;=</option>
+				    	<option value="GREATER_THAN">&gt;</option>
+				    	<option value="IN" disabled="disabled">IN</option>
+				    </select>
+					<input type="text" class="value" placeholder="Value"/>
+					<select class="type">
+						<option value="INTEGER">Integer</option>
+						<option value="FLOATING">Floating</option>
+						<option value="BOOLEAN">Boolean</option>
+						<option value="STRING">String</option>
+
+						<!--
+						Can not be indexed.
+						<option value="TEXT">Text</option>
+						<option value="SHORT_BLOB">Short Blob</option>
+						<option value="BLOB">Blob</option>
+						<option value="EMBEDDED_ENTITY">Embedded Entity</option>
+						-->
+
+						<option value="DATETIME">Date Time</option>
+
+						<option value="GEO">Geo Point</option>
+						<option value="POSTAL_ADDRESS">Postal Address</option>
+						<option value="PHONE_NUMBER">Phone Number</option>
+						<option value="EMAIL">Email</option>
+						<option value="USER">User</option>
+
+						<option value="IM_HANDLE">IM Handle</option>
+						<option value="LINK">Link</option>
+						<option value="CATEGORY">Category</option>
+						<option value="RATING">Rating</option>
+						<option value="KEY">Key</option>
+						<option value="BLOB_KEY">Blob Key</option>
+
+						<option value="NULL">null</option>
+					</select>
+					<input type="checkbox" class="active" checked="checked"/>
+				</div>
+			</div>
+		</div>
+		<div>
+			<div><label for="limit">LIMIT</label></div>
+			<div><input type="text" id="limit" value="50"/></div>
+		</div>
+	</div>
+	<button onclick="refresh()">List</button>
+	<button onclick="delete_()">Delete</button>
+	<button onclick="count()">Count</button>
+	<span id="count"></span>
+	<table id="table">
+		<thead></thead>
+		<tbody></tbody>
+	</table>
+</body>
+</html>

@@ -1,0 +1,69 @@
+project.version = "0.9"
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+
+repositories {
+    mavenCentral()
+}
+
+// From http://stackoverflow.com/questions/20421681
+// See also http://forums.gradle.org/gradle/topics/how_do_i_best_define_dependencies_as_provided
+configurations {
+    provided
+    provided.extendsFrom(compile)
+}
+sourceSets {
+    main { compileClasspath += configurations.provided }
+}
+
+idea {
+    module {
+        scopes.PROVIDED.plus += configurations.provided
+        downloadJavadoc = false
+        downloadSources = true
+    }
+}
+eclipse {
+    classpath {
+        downloadSources = true
+    }
+}
+
+dependencies {
+    compile 'com.google.code.findbugs:jsr305:2.+' // 2.0.3
+    compile 'com.google.guava:guava:+' // 16.0.1
+    compile 'joda-time:joda-time:2.+' // 2.3
+    compile 'commons-io:commons-io:2.+' // 2.4
+
+	// GAE
+	compile 'com.google.appengine:appengine-api-1.0-sdk:+'
+	compile 'com.googlecode.objectify:objectify:+' // 4.1
+
+	// Logging
+	compile 'org.slf4j:slf4j-api:1.+' // 1.7.6
+	compile 'org.slf4j:slf4j-jdk14:1.+' // 1.7.6 // Redirect to JUL, GAE logging.
+
+	// DI
+	compile 'javax.inject:javax.inject:1'
+	compile 'com.google.inject:guice:+' // 3.0
+	compile 'com.google.inject.extensions:guice-servlet:+' // 3.0
+
+	// Web stack.
+	provided 'javax.servlet:servlet-api:2.5'
+	compile 'com.sun.jersey:jersey-server:1.+' // 1.18.1
+	compile 'com.sun.jersey.contribs:jersey-guice:1.+' // 1.18.1
+	// Deps below are transitive for above two, but Gradle doesn't read <profiles> in pom.xml.
+	compile 'com.sun.jersey:jersey-core:1.+' // 1.18.1
+	compile 'com.sun.jersey:jersey-servlet:1.+' // 1.18.1
+
+	compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.+' // 2.3.2 // Handle application/json
+
+	// Testing
+	testCompile 'org.testng:testng:6.+' // 6.8.8
+	testCompile 'org.mockito:mockito-all:1.+' // 1.9.5
+	testCompile 'com.google.appengine:appengine-api-stubs:+' // 1.9.1
+	testCompile 'com.google.appengine:appengine-testing:+' // 1.9.1
+}
