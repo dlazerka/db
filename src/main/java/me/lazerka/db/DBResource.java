@@ -1,12 +1,11 @@
 package me.lazerka.db;
 
 import com.google.appengine.api.datastore.*;
-import com.google.appengine.api.datastore.Query.CompositeFilter;
-import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
-import com.google.appengine.api.datastore.Query.Filter;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.*;
 import com.google.common.collect.Lists;
 import me.lazerka.db.Row.Value.Type;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +14,9 @@ import javax.servlet.http.HttpServlet;
 import javax.ws.rs.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,7 +39,7 @@ public class DBResource extends HttpServlet {
 	public List<Row> list(
 			@QueryParam("kind") @DefaultValue("") String kind,
 			@QueryParam("ancestor") @DefaultValue("") String ancestor,
-			@QueryParam("filter") List<String> filters,
+			@QueryParam("filters") List<String> filters,
 			@QueryParam("limit") @DefaultValue("100") int limit
 	) throws IOException {
 		List<Row> result = new ArrayList<>(100);
@@ -53,10 +54,10 @@ public class DBResource extends HttpServlet {
 
 		for(Entity entity : iterable) {
 			Row row = new Row();
-			row.put(Entity.KEY_RESERVED_PROPERTY, toJsonProperty(entity.getKey()));
+			row.put(Entity.KEY_RESERVED_PROPERTY, toRowValue(entity.getKey()));
 			for(String key : entity.getProperties().keySet()) {
 				Object value = entity.getProperty(key);
-				row.put(key, toJsonProperty(value));
+				row.put(key, toRowValue(value));
 			}
 			result.add(row);
 		}
@@ -182,8 +183,11 @@ public class DBResource extends HttpServlet {
 
 	private Query addFilters(Query q, List<String> filters) {
 		List<Filter> predicates = Lists.newArrayList();
+		logger.warn("{}", filters);
 		for(String filter : filters) {
-			Pattern typedFieldValue = Pattern.compile("^([^<>=!]+) ([<>=!]+) (String|Long|Key|Boolean|Email|Null)\\(([^\\)]*)\\)$");
+			Pattern typedFieldValue = Pattern.compile(
+					"^([^<>=!]+) ([<>=!]+) (String|Long|Key|Boolean|Email|Null)\\(([^\\)]*)\\)$",
+					Pattern.CASE_INSENSITIVE);
 			Matcher matcher = typedFieldValue.matcher(filter);
 			if (!matcher.matches()) {
 				throw new IllegalArgumentException("Unable to parse filter `" + filter + "`.");
@@ -193,7 +197,7 @@ public class DBResource extends HttpServlet {
 			String typeS = matcher.group(3);
 			String valueStr = matcher.group(4);
 
-			Query.FilterOperator operator = Query.FilterOperator.valueOf(operatorS);
+			Query.FilterOperator operator = toFilterOperator(operatorS);
 			Row.Value.Type type = Type.valueOf(typeS.toUpperCase());
 
 			if (field.equals(Entity.KEY_RESERVED_PROPERTY)) {
@@ -205,18 +209,49 @@ public class DBResource extends HttpServlet {
 			FilterPredicate predicate = new FilterPredicate(field, operator, value);
 			predicates.add(predicate);
 		}
-		if (!predicates.isEmpty()) {
+		if (predicates.size() == 1) {
+			q.setFilter(predicates.get(0));
+		} else if (predicates.size() > 1) {
 			q.setFilter(new CompositeFilter(CompositeFilterOperator.AND, predicates));
 		}
 		return q;
 	}
 
-	private Row.Value toJsonProperty(Object value) throws IOException {
-		String valueStr = String.valueOf(value);
+	private FilterOperator toFilterOperator(String operatorS) {
+		for(FilterOperator filterOperator : FilterOperator.values()) {
+			if (filterOperator.toString().equals(operatorS)) {
+				return filterOperator;
+			}
+		}
+		throw new IllegalArgumentException("No FilterOperator for {}" + operatorS);
+	}
+
+	private Row.Value toRowValue(Object value) throws IOException {
+		String valueStr;
+		if (value == null) {
+			valueStr = "null";
+		} else if (value instanceof Date) {
+			long ms = ((Date) value).getTime();
+			DateTime dt = new DateTime(ms);
+			valueStr = ISODateTimeFormat.dateTime().print(dt);
+		} else if (value instanceof EmbeddedEntity) {
+			EmbeddedEntity embeddedEntity = (EmbeddedEntity) value;
+			StringBuilder sb = new StringBuilder();
+			Map<String, Object> props = embeddedEntity.getProperties();
+			for(String key : props.keySet()) {
+				String val = String.valueOf(props.get(key));
+				sb.append(key).append(": ").append(val).append('\n');
+			}
+			valueStr = "<EmbeddedEntity:\n" + sb + ">";
+		} else {
+			valueStr = String.valueOf(value);
+		}
+
+		Type type = value == null ? Type.NULL : Type.fromClass(value.getClass());
+
 		if (valueStr.length() > MAX_VALUE_LENGTH) {
 			valueStr = valueStr.substring(0, MAX_VALUE_LENGTH);
 		}
-		Type type = value == null ? Type.NULL : Type.fromClass(value.getClass());
 		return new Row.Value(valueStr, type);
 	}
 

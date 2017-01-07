@@ -13,10 +13,15 @@ function fillFields(query) {
 	$('#limit').val(query.limit);
 	query.filters.forEach(function(filter){
 		var div = addFilterInput();
-		$('.name', div).val(filter.field);
-		$('.operator option[value="' + filter.operator + '"]', div).attr('selected', true);
-		$('.value', div).val(filter.value);
-		$('.type option[value="' + filter.type +'"]', div).attr('selected', true);
+		var regExp = new RegExp('^([^<>=!]+) ([<>=!]+) (String|Long|Key|Boolean|Email|Null)\\(([^\\)]*)\\)$', 'i');
+		var match = regExp.exec(filter);
+		if (!match || !match[0]) {
+			throw new Error('Cannot parse filter: ' + filter);
+		}
+		$('.name', div).val(match[1]);
+		$('.operator option[value="' + match[2] + '"]', div).attr('selected', true);
+		$('.value', div).val(match[4]);
+		$('.type option[value="' + match[3] +'"]', div).attr('selected', true);
 	});
 }
 function getValidatedQuery() {
@@ -33,7 +38,7 @@ function getValidatedQuery() {
 	} else {
 		if (kind) query.kind = kind;
 		if (query && ancestor) query.ancestor = ancestor;
-		filters = [];
+		var filters = [];
 		$('.filter').each(function(i, div) {
 			var name = $('.name', div).val();
 			var operator = $('.operator', div).val();
@@ -41,12 +46,7 @@ function getValidatedQuery() {
 			var type = $('.type', div).val();
 			var active = $('.active:checked', div).length > 0;
 			if (!name || !active) return;
-			filters.push({
-				'field': name,
-				'operator': operator,
-				'value': value,
-				'type': type
-			});
+			filters.push(name + ' ' + operator + ' ' + type + '(' +value + ')');
 		});
 		if (filters) query.filters = filters;
 		query.limit = $('#limit').val();
@@ -71,7 +71,7 @@ function refresh() {
 	if (!query) return;
 	document.title = 'Loading...';
 
-	$.get(ROOT + '/entity', $.param(query, false)).done(function(data, textStatus, jqXHR) {
+	$.get(ROOT + '/entity', $.param(query, true)).done(function(data, textStatus, jqXHR) {
 		document.title = (query.ancestor == undefined ? '' : query.ancestor) + ' ' + query.kind;
 		if (data.error) {
 			alert(data.error);

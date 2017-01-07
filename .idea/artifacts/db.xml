@@ -7,9 +7,7 @@
           <element id="module-output" name="db" />
         </element>
         <element id="directory" name="lib">
-          <element id="library" level="project" name="AppEngine API" />
           <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/aopalliance/aopalliance/1.0/235ba8b489512805ac13a8f9ea77a1ca5ebe3e8/aopalliance-1.0.jar" />
-          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.appengine/appengine-api-1.0-sdk/1.9.7/46d5e271ef30bf43837b2ccd5cbab7d7b0841710/appengine-api-1.0-sdk-1.9.7.jar" />
           <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/asm/asm/3.1/c157def142714c544bdea2e6144645702adf7097/asm-3.1.jar" />
           <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.sonatype.sisu.inject/cglib/2.2.1-v20090111/7ce5e983fd0e6c78346f4c9cbfa39d83049dda2/cglib-2.2.1-v20090111.jar" />
           <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-io/commons-io/2.4/b1b6ea3b7e4aa4f492509a4952029cd8e48019ad/commons-io-2.4.jar" />
@@ -32,6 +30,7 @@
           <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.googlecode.objectify/objectify/5.0.3/bdf3d99a259b6528841b4cf72a36dc0f1bb97703/objectify-5.0.3.jar" />
           <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.7/2b8019b6249bb05d81d3a3094e468753e2b21311/slf4j-api-1.7.7.jar" />
           <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-jdk14/1.7.7/25d160723ea37a6cb84e87cd70773ff02997e857/slf4j-jdk14-1.7.7.jar" />
+          <element id="library" level="project" name="com.google.appengine:appengine-api-1.0-sdk:1.9.15" />
         </element>
       </element>
       <element id="javaee-facet-resources" facet="db/web/Web" />

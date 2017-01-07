@@ -210,7 +210,7 @@ public class Row extends LinkedHashMap<String, Value> {
 		    NULL() {
 			    @Override
 			    Object fromString(String str) {
-				    checkArgument(str == null, str);
+				    checkArgument(str.equals(""), str);
 				    return null;
 			    }
 		    },

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="com.google.appengine:appengine-api-1.0-sdk:1.9.15" type="repository">
+    <properties maven-id="com.google.appengine:appengine-api-1.0-sdk:1.9.15" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-api-1.0-sdk/1.9.15/appengine-api-1.0-sdk-1.9.15.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/opt/googleappengine-read-only/java/src/appengine-api-src.zip!/" />
+    </SOURCES>
+  </library>
+</component>

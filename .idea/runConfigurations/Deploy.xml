@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Deploy" type="google-app-engine-deploy" factoryName="Google App Engine Deployment" singleton="true" server-name="Google App Engine">
+    <deployment type="artifact" name="db" />
+    <RunnerSettings RunnerId="DeployToServer" />
+    <ConfigurationWrapper RunnerId="DeployToServer" />
+    <method>
+      <option name="BuildArtifacts" enabled="true">
+        <artifact name="db" />
+      </option>
+    </method>
+  </configuration>
+</component>
